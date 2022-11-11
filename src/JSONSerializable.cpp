@@ -1,5 +1,6 @@
 #include "JSONSerializable.h"
 #include <stdio.h>
+#include <iostream>
 
 requests::JSONSerializable::JSONSerializable()
 {
@@ -31,11 +32,14 @@ json requests::JSONSerializable::marshal()
 
 bool requests::JSONSerializable::unmarshal(basic_json<>& j, char flags)
 {
+  if (_jsonSerMapping.empty())
+    defineJsonMapping();
+
   for (auto it = _jsonSerMapping.begin(); it != _jsonSerMapping.end(); ++it)
   {
     const auto& field = it->first;
     auto& mapping = it->second;
-    
+
     _jsonShadowMap[field] = 0;
 
     if (!j.contains(field))

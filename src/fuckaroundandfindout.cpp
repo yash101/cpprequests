@@ -8,6 +8,12 @@ public:
   int z;
   float x;
 
+  Child() {}
+  Child(int a, float b) :
+    z(a),
+    x(b)
+  { }
+
   virtual void defineJsonMapping()
   {
     mapJson("z", z);
@@ -44,6 +50,18 @@ int main(int argc, char** argv)
   t.c.push_back(3);
   t.ch.z = 69;
   t.ch.x = 6.9f;
+  t.children.push_back(Child(43, 22));
+  t.children.push_back(Child(443, 212));
+  t.children.push_back(Child(34, 242));
 
-  std::cout << t.marshal().dump() << std::endl;
+  std::string json_out = t.marshal().dump();
+  std::cout << json_out << std::endl;
+
+  Test newTest;
+  json in2 = json::parse(json_out);
+  newTest.unmarshal(in2, 0);
+
+  std::string json_out2 = newTest.marshal().dump();
+
+  std::cout << json_out2 << std::endl;
 }

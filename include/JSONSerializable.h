@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <cstdint>
 #include <functional>
+#include <iostream>
 
 #include <nlohmann/json.hpp>
 
@@ -56,7 +57,7 @@ namespace requests
       mapping.dataPointer = (void*) &reference;
       mapping.fromJson = [this, field](void* ref, basic_json<>& json) -> void {
         FieldType& r = *reinterpret_cast<FieldType*>(ref);
-        r = json[field];
+        r = (FieldType) json;
       };
       mapping.toJson = [this, field](void* ref) -> json {
         FieldType& r = *reinterpret_cast<FieldType*>(ref);
@@ -76,6 +77,17 @@ namespace requests
         return json(r);
       };
       mapping.fromJson = [this, field](void* ref, basic_json<>& json) {
+        std::vector<Item>& r = *reinterpret_cast<std::vector<Item>*>(ref);
+        if (!json.is_array())
+        {
+          _jsonShadowMap[field] = UNKNOWN_FIELD;
+          return;
+        }
+        r = std::vector<Item>(json.size());
+        for (size_t i = 0; i < json.size(); i++)
+        {
+          r[i] = json[i];
+        }
       };
 
       _jsonSerMapping[field] = mapping;
@@ -110,6 +122,7 @@ namespace requests
           arr[idx].unmarshal(j[idx], 0);
         }
       };
+      _jsonSerMapping[field] = mapping;
     }
 
     template <typename FieldType>
@@ -149,37 +162,3 @@ namespace requests
 }
 
 #endif
-
-/*
-Goals:
-
-class JSONSerializable
-{
-public:
-  void marshal(JSON& json);
-  void unmarshal(JSON& json);
-
-  void mapToJson(std::string fieldname, int& reference);
-  void mapToJson(std::string fieldname, long& reference);
-  void mapToJson(std::string fieldname, std::string& reference);
-  void mapToJson(std::string fieldname, const char*& reference);
-  void mapToJson(std::string fieldname, float& reference);
-  void mapToJson(std::string fieldname, double& reference);
-  void mapToJson(std::string fieldname, )
-}
-
-class Foo : public JSONSerializable
-{
-private:
-  int x;
-  std::string y;
-
-public:
-  Foo()
-  {
-    this->mapToJson("x", x);
-    this->mapToJson("y", y);
-  }
-}
-
- */
