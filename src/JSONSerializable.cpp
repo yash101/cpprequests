@@ -17,13 +17,11 @@ json requests::JSONSerializable::marshal()
 {
   if (_jsonSerMapping.empty())
     defineJsonMapping();
-  printf("Mappings: %d\n", _jsonSerMapping.size());
   json j;
   for (auto it = _jsonSerMapping.begin(); it != _jsonSerMapping.end(); ++it)
   {
     const auto& field = it->first;
     auto& mapping = it->second;
-    printf("Field: %s\n", field.c_str());
     
     j[field] = mapping.toJson(mapping.dataPointer);
   }
@@ -38,7 +36,6 @@ bool requests::JSONSerializable::unmarshal(basic_json<>& j, char flags)
     const auto& field = it->first;
     auto& mapping = it->second;
     
-    printf("Field: %s\n", field.c_str());
     _jsonShadowMap[field] = 0;
 
     if (!j.contains(field))
@@ -91,6 +88,5 @@ void requests::JSONSerializable::mapJson
   };
   _jsonSerMapping[field] = mapping;
 }
-
 
 

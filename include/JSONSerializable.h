@@ -81,6 +81,37 @@ namespace requests
       _jsonSerMapping[field] = mapping;
     }
 
+    template <typename ArrayType>
+    void mapJsonToSerializableArray(std::string field, ArrayType& vec)
+    {
+      _jsonSerMappingData mapping;
+      mapping.dataPointer = &vec;
+      mapping.toJson = [this](void* ptr) -> json {
+        ArrayType& arr = *reinterpret_cast<ArrayType*>(ptr);
+        std::vector<json> lst;
+        lst.reserve(arr.size());
+        for (auto it = arr.begin(); it != arr.end(); ++it)
+        {
+          lst.push_back(it->marshal());
+        }
+        return json(lst);
+      };
+      mapping.fromJson = [this, field](void* ptr, basic_json<>& j) {
+        ArrayType& arr = *reinterpret_cast<ArrayType*>(ptr);
+        if (!j.is_array())
+        {
+          _jsonShadowMap[field] = UNKNOWN_FIELD;
+          return;
+        }
+        arr.clear();
+        arr = ArrayType(j.size());
+        for (size_t idx = 0; idx < j.size(); idx++)
+        {
+          arr[idx].unmarshal(j[idx], 0);
+        }
+      };
+    }
+
     template <typename FieldType>
     void mapJson(
       std::string field,
@@ -114,7 +145,7 @@ namespace requests
   void JSONSerializable::mapJson<JSONSerializable>(std::string field, JSONSerializable& object);
 
   template<>
-  inline void JSONSerializable::mapJson<basic_json<>>(std::string field, basic_json<>& j);
+  void JSONSerializable::mapJson<basic_json<>>(std::string field, basic_json<>& j);
 }
 
 #endif

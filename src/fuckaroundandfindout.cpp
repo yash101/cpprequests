@@ -22,6 +22,7 @@ public:
   float b;
   std::vector<int> c;
   Child ch;
+  std::vector<Child> children;
 
 protected:
   virtual void defineJsonMapping()
@@ -30,6 +31,7 @@ protected:
     mapJson("world", b);
     mapJson("listA", c);
     mapJson<requests::JSONSerializable>("childClass", ch);
+    mapJsonToSerializableArray("children", children);
   }
 };
 
