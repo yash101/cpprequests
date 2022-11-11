@@ -1,12 +1,29 @@
 #include "JSONSerializable.h"
+#include <stdio.h>
+
+requests::JSONSerializable::JSONSerializable()
+{
+}
+
+requests::JSONSerializable::~JSONSerializable()
+{
+}
+
+void requests::JSONSerializable::defineJsonMapping()
+{
+}
 
 json requests::JSONSerializable::marshal()
 {
+  if (_jsonSerMapping.empty())
+    defineJsonMapping();
+  printf("Mappings: %d\n", _jsonSerMapping.size());
   json j;
   for (auto it = _jsonSerMapping.begin(); it != _jsonSerMapping.end(); ++it)
   {
     const auto& field = it->first;
     auto& mapping = it->second;
+    printf("Field: %s\n", field.c_str());
     
     j[field] = mapping.toJson(mapping.dataPointer);
   }
@@ -16,6 +33,27 @@ json requests::JSONSerializable::marshal()
 
 bool requests::JSONSerializable::unmarshal(basic_json<>& j, char flags)
 {
+  for (auto it = _jsonSerMapping.begin(); it != _jsonSerMapping.end(); ++it)
+  {
+    const auto& field = it->first;
+    auto& mapping = it->second;
+    
+    printf("Field: %s\n", field.c_str());
+    _jsonShadowMap[field] = 0;
+
+    if (!j.contains(field))
+    {
+      _jsonShadowMap[field] = FIELD_MISSING | FIELD_UNDEFINED;
+    }
+
+    if (j[field].is_null())
+    {
+      _jsonShadowMap[field] = FIELD_NULL;
+      continue;
+    }
+
+    mapping.fromJson(mapping.dataPointer, j[field]);
+  }
 }
 
 template <>
@@ -39,21 +77,20 @@ void requests::JSONSerializable::mapJson
 template <>
 void requests::JSONSerializable::mapJson
 <basic_json<>>
-(std::string field, basic_json<>& json)
+(std::string field, basic_json<>& j)
 {
+  _jsonSerMappingData mapping;
+  mapping.dataPointer = &j;
+  mapping.toJson = [this, field](void* ref) -> json {
+    basic_json<>& r = *reinterpret_cast<basic_json<>*>(ref);
+    return r;
+  };
+  mapping.fromJson = [this, field](void* ref, basic_json<>& j) {
+    basic_json<>& r = *reinterpret_cast<basic_json<>*>(ref);
+    r = j;
+  };
+  _jsonSerMapping[field] = mapping;
 }
 
-class Test : public requests::JSONSerializable
-{
-  int a;
-  float b;
-  std::vector<int> c;
 
-protected:
-  virtual void defineJsonMapping()
-  {
-    mapJson("hello", a);
-    mapJson("world", b);
-    mapJson("listA", c);
-  }
-};
+

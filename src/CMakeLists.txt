@@ -4,7 +4,7 @@ add_library(
 )
 
 target_link_libraries(jsonserializable_obj PRIVATE nlohmann_json::nlohmann_json)
-target_include_directories(jsonserializable_obj PRIVATE ${CPPREQUESTS_INCLUDE_DIR})
+target_include_directories(jsonserializable_obj PUBLIC ${CPPREQUESTS_INCLUDE_DIR})
 
 add_library(
   jsonserializable_static STATIC
@@ -16,6 +16,13 @@ add_library(
   $<TARGET_OBJECTS:jsonserializable_obj>
 )
 
-target_link_libraries(jsonserializable_static PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(jsonserializable PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(jsonserializable_static PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(jsonserializable PUBLIC nlohmann_json::nlohmann_json)
 
+add_executable(
+  fuckaroundandfindout
+    fuckaroundandfindout.cpp
+)
+
+target_link_libraries(fuckaroundandfindout PRIVATE jsonserializable)
+target_include_directories(fuckaroundandfindout PUBLIC ${CPPREQUESTS_INCLUDE_DIR})

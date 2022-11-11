@@ -22,7 +22,6 @@ namespace requests
     const static char FIELD_NULL = 1 << 0;
     const static char FIELD_UNDEFINED = 1 << 1;
     const static char FIELD_MISSING = 1 << 2;
-    const static char FIELD_TYPE_MISMATCH = 1 << 3;
     const static char UNKNOWN_FIELD = 1 << 4;
     const static char VALIDATE_SHALLOW = 1 << 5;
     const static char VALIDATE_RECURSIVE = 1 << 6;
@@ -38,8 +37,6 @@ namespace requests
       inline _jsonSerMappingData() :
         dataPointer(nullptr)
       { }
-
-      ~_jsonSerMappingData() = default;
     };
 
     std::unordered_map<std::string, _jsonSerMappingData> _jsonSerMapping;
@@ -47,8 +44,8 @@ namespace requests
     std::unordered_map<std::string, std::string> _jsonUnknownFields;
 
   protected:
-    JSONSerializable() = default;
-    virtual ~JSONSerializable() = default;
+    JSONSerializable();
+    virtual ~JSONSerializable();
 
     inline void setJsonFieldFlag(std::string fieldname, char flags);
 
@@ -84,6 +81,27 @@ namespace requests
       _jsonSerMapping[field] = mapping;
     }
 
+    template <typename FieldType>
+    void mapJson(
+      std::string field,
+      FieldType& reference,
+      std::function<void(FieldType&, basic_json<>&)> fromJson,
+      std::function<json(FieldType&)> toJson
+    )
+    {
+      _jsonSerMappingData mapping;
+      mapping.dataPointer = &reference;
+      mapping.toJson = [this, field, toJson](void* reference) -> json {
+        FieldType& ref = *reinterpret_cast<FieldType*>(reference);
+        return toJson(ref);
+      };
+      mapping.fromJson = [this, field, fromJson](void* reference, basic_json<>& json) {
+        FieldType& ref = *reinterpret_cast<FieldType*>(reference);
+        return fromJson(ref, json);
+      };
+      _jsonSerMapping[field] = mapping;
+    }
+
   protected:
     virtual void defineJsonMapping();
   
@@ -96,7 +114,7 @@ namespace requests
   void JSONSerializable::mapJson<JSONSerializable>(std::string field, JSONSerializable& object);
 
   template<>
-  void JSONSerializable::mapJson<basic_json<>>(std::string field, basic_json<>& json);
+  inline void JSONSerializable::mapJson<basic_json<>>(std::string field, basic_json<>& j);
 }
 
 #endif
