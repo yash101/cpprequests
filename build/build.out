@@ -1,0 +1,55 @@
+Scanning dependencies of target jsonserializable_obj
+[ 33%] Building CXX object src/CMakeFiles/jsonserializable_obj.dir/JSONSerializable.cpp.o
+In file included from /home/yash/code2/cpprequests/src/JSONSerializable.cpp:1:
+/home/yash/code2/cpprequests/include/JSONSerializable.h: In lambda function:
+/home/yash/code2/cpprequests/include/JSONSerializable.h:81:88: error: no matching function for call to ‘nlohmann::json_abi_v3_11_2::basic_json<>::get()’
+   81 |         *reinterpret_cast<FieldType*>(ref) = requests::from_string<FieldType>(json.get());
+      |                                                                                        ^
+In file included from /home/yash/code2/cpprequests/include/JSONSerializable.h:10,
+                 from /home/yash/code2/cpprequests/src/JSONSerializable.cpp:1:
+/home/yash/code2/cpprequests/build/_deps/json-src/include/nlohmann/json.hpp:1731:10: note: candidate: ‘template<class ValueTypeCV, class ValueType> decltype (declval<const basic_json_t&>().get_impl<ValueType>((nlohmann::json_abi_v3_11_2::detail::priority_tag<4>)(<brace-enclosed initializer list>()))) nlohmann::json_abi_v3_11_2::basic_json<ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType>::get() const [with ValueTypeCV = ValueTypeCV; ValueType = ValueType; ObjectType = std::map; ArrayType = std::vector; StringType = std::__cxx11::basic_string<char>; BooleanType = bool; NumberIntegerType = long int; NumberUnsignedType = long unsigned int; NumberFloatType = double; AllocatorType = std::allocator; JSONSerializer = nlohmann::json_abi_v3_11_2::adl_serializer; BinaryType = std::vector<unsigned char>]’
+ 1731 |     auto get() const noexcept(
+      |          ^~~
+/home/yash/code2/cpprequests/build/_deps/json-src/include/nlohmann/json.hpp:1731:10: note:   template argument deduction/substitution failed:
+In file included from /home/yash/code2/cpprequests/src/JSONSerializable.cpp:1:
+/home/yash/code2/cpprequests/include/JSONSerializable.h:81:88: note:   couldn’t deduce template parameter ‘ValueTypeCV’
+   81 |         *reinterpret_cast<FieldType*>(ref) = requests::from_string<FieldType>(json.get());
+      |                                                                                        ^
+In file included from /home/yash/code2/cpprequests/include/JSONSerializable.h:10,
+                 from /home/yash/code2/cpprequests/src/JSONSerializable.cpp:1:
+/home/yash/code2/cpprequests/build/_deps/json-src/include/nlohmann/json.hpp:1772:10: note: candidate: ‘template<class PointerType, typename std::enable_if<std::is_pointer<_Tp>::value, int>::type <anonymous> > decltype (declval<nlohmann::json_abi_v3_11_2::basic_json<ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType>::basic_json_t&>().get_ptr<PointerType>()) nlohmann::json_abi_v3_11_2::basic_json<ObjectType, ArrayType, StringType, BooleanType, NumberIntegerType, NumberUnsignedType, NumberFloatType, AllocatorType, JSONSerializer, BinaryType>::get() [with PointerType = PointerType; typename std::enable_if<std::is_pointer<_Ptr>::value, int>::type <anonymous> = <enumerator>; ObjectType = std::map; ArrayType = std::vector; StringType = std::__cxx11::basic_string<char>; BooleanType = bool; NumberIntegerType = long int; NumberUnsignedType = long unsigned int; NumberFloatType = double; AllocatorType = std::allocator; JSONSerializer = nlohmann::json_abi_v3_11_2::adl_serializer; BinaryType = std::vector<unsigned char>]’
+ 1772 |     auto get() noexcept -> decltype(std::declval<basic_json_t&>().template get_ptr<PointerType>())
+      |          ^~~
+/home/yash/code2/cpprequests/build/_deps/json-src/include/nlohmann/json.hpp:1772:10: note:   template argument deduction/substitution failed:
+In file included from /home/yash/code2/cpprequests/src/JSONSerializable.cpp:1:
+/home/yash/code2/cpprequests/include/JSONSerializable.h:81:88: note:   couldn’t deduce template parameter ‘PointerType’
+   81 |         *reinterpret_cast<FieldType*>(ref) = requests::from_string<FieldType>(json.get());
+      |                                                                                        ^
+/home/yash/code2/cpprequests/include/JSONSerializable.h: In member function ‘void requests::JSONSerializable::mapToJson(std::string, std::vector<JSONSerializableBaseType>&)’:
+/home/yash/code2/cpprequests/include/JSONSerializable.h:96:12: error: ‘struct requests::JSONSerializable::_jsonSerMappingData’ has no member named ‘isVector’
+   96 |       data.isVector = true;
+      |            ^~~~~~~~
+/home/yash/code2/cpprequests/include/JSONSerializable.h:98:12: error: ‘struct requests::JSONSerializable::_jsonSerMappingData’ has no member named ‘fromJsonToArray’
+   98 |       data.fromJsonToArray =
+      |            ^~~~~~~~~~~~~~~
+/home/yash/code2/cpprequests/include/JSONSerializable.h:99:35: error: ‘basic_json’ is not a type
+   99 |         [](void* mappedReference, basic_json& json) -> void
+      |                                   ^~~~~~~~~~
+In file included from /home/yash/code2/cpprequests/src/JSONSerializable.cpp:1:
+/home/yash/code2/cpprequests/include/JSONSerializable.h:105:12: error: ‘struct requests::JSONSerializable::_jsonSerMappingData’ has no member named ‘toJsonFromArray’
+  105 |       data.toJsonFromArray =
+      |            ^~~~~~~~~~~~~~~
+/home/yash/code2/cpprequests/include/JSONSerializable.h: In lambda function:
+/home/yash/code2/cpprequests/include/JSONSerializable.h:108:7: warning: no return statement in function returning non-void [-Wreturn-type]
+  108 |       };
+      |       ^
+/home/yash/code2/cpprequests/src/JSONSerializable.cpp: In member function ‘void requests::JSONSerializable::mapToJson(std::string, requests::JSONSerializable&)’:
+/home/yash/code2/cpprequests/src/JSONSerializable.cpp:49:47: error: ‘JSONSerializableFromJSON’ is not a member of ‘requests::JSONSerializable’
+   49 |   data.fromJson = requests::JSONSerializable::JSONSerializableFromJSON;
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/yash/code2/cpprequests/src/JSONSerializable.cpp:50:45: error: ‘JSONSerializableToJSON’ is not a member of ‘requests::JSONSerializable’
+   50 |   data.toJson = requests::JSONSerializable::JSONSerializableToJSON;
+      |                                             ^~~~~~~~~~~~~~~~~~~~~~
+make[2]: *** [src/CMakeFiles/jsonserializable_obj.dir/build.make:63: src/CMakeFiles/jsonserializable_obj.dir/JSONSerializable.cpp.o] Error 1
+make[1]: *** [CMakeFiles/Makefile2:173: src/CMakeFiles/jsonserializable_obj.dir/all] Error 2
+make: *** [Makefile:84: all] Error 2
