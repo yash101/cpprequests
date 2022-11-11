@@ -1,27 +1,5 @@
 #include "JSONSerializable.h"
 
-#define defineConversionFunctionDefinition(type) \
-  std::string requests::JSONSerializable::type##ToString(void* ptr) \
-  { \
-    return std::to_string(*reinterpret_cast<type*>(ptr)); \
-  } \
-  \
-  void requests::JSONSerializable::type##FromString(void* ptr, std::string& val) \
-  { \
-    *reinterpret_cast<type*>(ptr) = requests::from_string<type>(val); \
-  }
-
-defineConversionFunctionDefinition(int8_t);
-defineConversionFunctionDefinition(int16_t);
-defineConversionFunctionDefinition(int32_t);
-defineConversionFunctionDefinition(int64_t);
-defineConversionFunctionDefinition(uint8_t);
-defineConversionFunctionDefinition(uint16_t);
-defineConversionFunctionDefinition(uint32_t);
-defineConversionFunctionDefinition(uint64_t);
-defineConversionFunctionDefinition(float);
-defineConversionFunctionDefinition(double);
-
 json requests::JSONSerializable::marshal()
 {
   json j;
@@ -36,3 +14,46 @@ json requests::JSONSerializable::marshal()
   return j;
 }
 
+bool requests::JSONSerializable::unmarshal(basic_json<>& j, char flags)
+{
+}
+
+template <>
+void requests::JSONSerializable::mapJson
+<requests::JSONSerializable>
+(std::string field, requests::JSONSerializable& object)
+{
+  _jsonSerMappingData mapping;
+  mapping.dataPointer = &object;
+  mapping.toJson = [this, field](void* ref) -> json {
+    requests::JSONSerializable* r = reinterpret_cast<requests::JSONSerializable*>(ref);
+    return r->marshal();
+  };
+  mapping.fromJson = [this, field](void* ref, basic_json<>& json) {
+    requests::JSONSerializable* r = reinterpret_cast<requests::JSONSerializable*>(ref);
+    r->unmarshal(json, 0);
+  };
+  _jsonSerMapping[field] = mapping;
+}
+
+template <>
+void requests::JSONSerializable::mapJson
+<basic_json<>>
+(std::string field, basic_json<>& json)
+{
+}
+
+class Test : public requests::JSONSerializable
+{
+  int a;
+  float b;
+  std::vector<int> c;
+
+protected:
+  virtual void defineJsonMapping()
+  {
+    mapJson("hello", a);
+    mapJson("world", b);
+    mapJson("listA", c);
+  }
+};

@@ -28,24 +28,6 @@ namespace requests
     const static char VALIDATE_RECURSIVE = 1 << 6;
 
   private:
-    #define defineConversionFunctionDefinition(type) \
-      static std::string type##ToString (void* tp); \
-      static void type##FromString (void* tp, std::string& val)
-
-    defineConversionFunctionDefinition(int8_t);
-    defineConversionFunctionDefinition(int16_t);
-    defineConversionFunctionDefinition(int32_t);
-    defineConversionFunctionDefinition(int64_t);
-    defineConversionFunctionDefinition(uint8_t);
-    defineConversionFunctionDefinition(uint16_t);
-    defineConversionFunctionDefinition(uint32_t);
-    defineConversionFunctionDefinition(uint64_t);
-    defineConversionFunctionDefinition(float);
-    defineConversionFunctionDefinition(double);
-
-    #undef defineConversionFunctionDefinition
-
-  private:
 
     struct _jsonSerMappingData
     {
@@ -76,56 +58,31 @@ namespace requests
       _jsonSerMappingData mapping;
       mapping.dataPointer = (void*) &reference;
       mapping.fromJson = [this, field](void* ref, basic_json<>& json) -> void {
-        if (!json.is_primitive())
-          this->_jsonShadowMap[field] = FIELD_TYPE_MISMATCH;
-        *reinterpret_cast<FieldType*>(ref) = requests::from_string<FieldType>(json.get());
+        FieldType& r = *reinterpret_cast<FieldType*>(ref);
+        r = json[field];
       };
       mapping.toJson = [this, field](void* ref) -> json {
-        return json(std::to_string(*reinterpret_cast<FieldType*>(ref)));
+        FieldType& r = *reinterpret_cast<FieldType*>(ref);
+        return json(r);
       };
+
       _jsonSerMapping[field] = mapping;
     }
 
-    void mapToJson(std::string field, JSONSerializable& object);
-
-    template <typename JSONSerializableBaseType>
-    void mapToJson(std::string field, std::vector<JSONSerializableBaseType>& vec)
+    template <typename Item>
+    void mapJson(std::string field, std::vector<Item>& reference)
     {
-      _jsonSerMappingData data;
-      data.dataPointer = &vec;
-      data.isVector = true;
-
-      data.fromJsonToArray =
-        [](void* mappedReference, basic_json& json) -> void
-      {
-        std::vector<JSONSerializableBaseType>& vec = *reinterpret_cast<std::vector<JSONSerializableBaseType>*>(mappedReference);
-        vec.clear();
+      _jsonSerMappingData mapping;
+      mapping.dataPointer = &reference;
+      mapping.toJson = [this, field](void* ref) -> json {
+        std::vector<Item>& r = *reinterpret_cast<std::vector<Item>*>(ref);
+        return json(r);
+      };
+      mapping.fromJson = [this, field](void* ref, basic_json<>& json) {
       };
 
-      data.toJsonFromArray =
-        [](void* mappedReference) -> json
-      {
-      };
+      _jsonSerMapping[field] = mapping;
     }
-
-
-  protected:
-    #define defineMapFunction(type) \
-      void mapToJson(std::string field, type& reference); \
-      void mapToJson(std::string field, std::vector<type>& reference)
-
-    defineMapFunction(int8_t);
-    defineMapFunction(int16_t);
-    defineMapFunction(int32_t);
-    defineMapFunction(int64_t);
-    defineMapFunction(uint8_t);
-    defineMapFunction(uint16_t);
-    defineMapFunction(uint32_t);
-    defineMapFunction(uint64_t);
-    defineMapFunction(float);
-    defineMapFunction(double);
-
-    #undef defineMapFunction
 
   protected:
     virtual void defineJsonMapping();
@@ -134,6 +91,12 @@ namespace requests
     json marshal();
     bool unmarshal(basic_json<>& j, char flags);
   };
+
+  template <>
+  void JSONSerializable::mapJson<JSONSerializable>(std::string field, JSONSerializable& object);
+
+  template<>
+  void JSONSerializable::mapJson<basic_json<>>(std::string field, basic_json<>& json);
 }
 
 #endif
