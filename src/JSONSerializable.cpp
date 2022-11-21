@@ -18,6 +18,7 @@ json requests::JSONSerializable::marshal()
 {
   if (_jsonSerMapping.empty())
     defineJsonMapping();
+
   json j;
   for (auto it = _jsonSerMapping.begin(); it != _jsonSerMapping.end(); ++it)
   {

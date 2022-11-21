@@ -64,4 +64,7 @@ int main(int argc, char** argv)
   std::string json_out2 = newTest.marshal().dump();
 
   std::cout << json_out2 << std::endl;
+
+  std::string json_out3 = newTest.marshal().dump();
+  std::cout << json_out3 << std::endl;
 }

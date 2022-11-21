@@ -12,17 +12,39 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-option(BUILD_LIBCURL "Build libcURL from source" ON)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH})
 
-IF (BUILD_LIBCURL)
-  find_package(CURL)
-ENDIF()
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+  file(DOWNLOAD
+    "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
+    "${CMAKE_BINARY_DIR}/conan.cmake"
+    TLS_VERIFY ON
+  )
+endif()
 
-IF (NOT CURL_FOUND OR BUILD_LIBCURL)
-  include(cmake/build_curl.cmake)
-ELSE ()
-ENDIF ()
+include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-include(cmake/nlohmann_json.cmake)
+# Set up dependencies
+conan_cmake_configure(
+  REQUIRES
+    fmt
+  GENERATORS
+    cmake_find_package
+)
+
+conan_cmake_autodetect(settings)
+
+conan_cmake_install(
+  PATH_OR_REFERENCE .
+  BUILD missing
+  REMOTE conan-center
+  SETTINGS ${settings}
+)
+
+find_package(fmt)
+
+# include(cmake/nlohmann_json.cmake)
 
 add_subdirectory(src)
