@@ -20,9 +20,9 @@ target_link_libraries(jsonserializable_static PUBLIC nlohmann_json::nlohmann_jso
 target_link_libraries(jsonserializable PUBLIC nlohmann_json::nlohmann_json)
 
 add_executable(
-  fuckaroundandfindout
-    fuckaroundandfindout.cpp
+  test_executable
+    test_executable.cpp
 )
 
-target_link_libraries(fuckaroundandfindout PRIVATE jsonserializable)
-target_include_directories(fuckaroundandfindout PUBLIC ${CPPREQUESTS_INCLUDE_DIR})
+target_link_libraries(test_executable PRIVATE jsonserializable)
+target_include_directories(test_executable PUBLIC ${CPPREQUESTS_INCLUDE_DIR})
