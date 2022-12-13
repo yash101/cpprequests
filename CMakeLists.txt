@@ -29,7 +29,8 @@ include(${CMAKE_BINARY_DIR}/conan.cmake)
 # Set up dependencies
 conan_cmake_configure(
   REQUIRES
-    fmt
+    nlohmann_json/3.11.2
+    libcurl/7.86.0
   GENERATORS
     cmake_find_package
 )
@@ -39,12 +40,10 @@ conan_cmake_autodetect(settings)
 conan_cmake_install(
   PATH_OR_REFERENCE .
   BUILD missing
-  REMOTE conan-center
+  REMOTE conancenter
   SETTINGS ${settings}
 )
 
-find_package(fmt)
-
-# include(cmake/nlohmann_json.cmake)
+find_package(nlohmann_json)
 
 add_subdirectory(src)

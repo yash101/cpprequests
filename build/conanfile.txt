@@ -1,4 +1,5 @@
 [requires]
-fmt
+nlohmann_json/3.11.2
+libcurl/7.86.0
 [generators]
 cmake_find_package
