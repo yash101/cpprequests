@@ -8,6 +8,28 @@
 
 namespace Requests
 {
+  class DataStream
+  {
+  private:
+    std::vector<std::string> buffer;
+    bool isOpen();
+
+  public:
+    DataStream();
+    virtual ~DataStream();
+
+    void put(std::string data);
+    void put(const char* data, size_t length);
+
+    void get(char* buffer, size_t maxlen, bool fill);
+    void get(std::string& buffer, size_t maxlen, bool fill);
+
+    std::string getAll();
+
+    bool isOpen();
+    void close();
+  };
+
   class HttpMethod
   {
   private:
