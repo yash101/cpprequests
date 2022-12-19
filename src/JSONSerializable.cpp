@@ -56,6 +56,8 @@ bool requests::JSONSerializable::unmarshal(basic_json<>& j, char flags)
 
     mapping.fromJson(mapping.dataPointer, j[field]);
   }
+
+  return true;
 }
 
 template <>

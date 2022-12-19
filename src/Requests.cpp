@@ -5,12 +5,12 @@ Requests::HttpMethod::HttpMethod(std::string name) :
 { }
 
 const Requests::HttpMethod Requests::HttpMethod::GET("GET");
-const Requests::HttpMethod Requests::HttpMethod::GET("HEAD");
-const Requests::HttpMethod Requests::HttpMethod::GET("PUT");
-const Requests::HttpMethod Requests::HttpMethod::GET("DELETE");
-const Requests::HttpMethod Requests::HttpMethod::GET("CONNECT");
-const Requests::HttpMethod Requests::HttpMethod::GET("OPTIONS");
-const Requests::HttpMethod Requests::HttpMethod::GET("PATCH");
+const Requests::HttpMethod Requests::HttpMethod::HEAD("HEAD");
+const Requests::HttpMethod Requests::HttpMethod::PUT("PUT");
+const Requests::HttpMethod Requests::HttpMethod::DELETE("DELETE");
+const Requests::HttpMethod Requests::HttpMethod::CONNECT("CONNECT");
+const Requests::HttpMethod Requests::HttpMethod::OPTIONS("OPTIONS");
+const Requests::HttpMethod Requests::HttpMethod::PATCH("PATCH");
 
 
 Requests::Request::Request(std::string url, HttpMethod method) :
@@ -29,6 +29,7 @@ Requests::Request& Requests::Request::operator=(Requests::Request&& other)
 {
   _url = std::move(other._url);
   _method = std::move(other._method);
+  return *this;
 }
 
 Requests::Response fetch(Requests::Request request)

@@ -5,29 +5,50 @@
 #include <vector>
 #include <tuple>
 #include <ostream>
+#include <mutex>
 
 namespace Requests
 {
   class DataStream
   {
   private:
-    std::vector<std::string> buffer;
-    bool isOpen();
+    std::vector<std::string> _buffer;
+    size_t _length;
+    size_t _bufferSize;
+    bool _open;
+
+    // for thread safety
+    std::mutex _mut;
 
   public:
     DataStream();
-    virtual ~DataStream();
+    DataStream(std::string str);
 
     void put(std::string data);
     void put(const char* data, size_t length);
 
-    void get(char* buffer, size_t maxlen, bool fill);
+    size_t get(char* buffer, size_t maxlen, bool fill);
     void get(std::string& buffer, size_t maxlen, bool fill);
 
-    std::string getAll();
+    std::string toString();
 
-    bool isOpen();
-    void close();
+    inline size_t size()
+    {
+      std::unique_lock<std::mutex>(_mut);
+      return _length;
+    }
+
+    inline bool isOpen()
+    {
+      std::unique_lock<std::mutex>(_mut);
+      return _open;
+    }
+
+    void close()
+    {
+      std::unique_lock<std::mutex>(_mut);
+      _open = false;
+    }
   };
 
   class HttpMethod
